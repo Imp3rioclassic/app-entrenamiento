@@ -14,11 +14,12 @@
             --text-light: #e0e0e0;
             --accent: #ffcc00;
             --facebook: #1877F2;
+            --danger: #e74c3c;
         }
 
         body {
             margin: 0;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-light);
             padding: 20px;
@@ -36,31 +37,51 @@
             border: 1px solid rgba(0, 212, 255, 0.1);
             margin-bottom: 20px;
             text-align: center;
+            transition: border 0.3s ease;
         }
 
-        .icon-header { font-size: 50px; cursor: pointer; filter: drop-shadow(0 0 10px var(--primary-color)); }
-        h1 { font-size: 1.4rem; color: #fff; margin: 10px 0 2px; }
-        .subtitle { color: var(--primary-color); font-size: 0.8rem; margin-bottom: 10px; font-weight: bold; }
+        .card.admin-active {
+            border: 1px solid var(--accent);
+        }
+
+        .icon-header { 
+            font-size: 50px; 
+            cursor: pointer; 
+            filter: drop-shadow(0 0 10px var(--primary-color));
+            user-select: none;
+        }
+        
+        h1 { font-size: 1.4rem; color: #fff; margin: 10px 0 2px; letter-spacing: 1px; }
+        .subtitle { color: var(--primary-color); font-size: 0.8rem; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
 
         .social-link { color: var(--facebook); font-size: 1.5rem; text-decoration: none; display: inline-block; margin-bottom: 15px; }
 
-        label { display: block; margin: 10px 0 5px; font-size: 0.8rem; opacity: 0.8; text-align: left; }
+        label { display: block; margin: 10px 0 5px; font-size: 0.75rem; opacity: 0.8; text-align: left; font-weight: 600; }
         
         input, select, textarea {
             width: 100%; padding: 12px; border-radius: 8px; background: #252525; color: white;
             border: 1px solid #444; box-sizing: border-box; margin-bottom: 10px; font-size: 1rem;
+            outline: none;
         }
+
+        input:focus, select:focus, textarea:focus { border-color: var(--primary-color); }
 
         #contenedorOtraFalla { display: none; }
 
         .checklist { text-align: left; background: #2a2a2a; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
         .check-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.9rem; cursor: pointer; }
-        .check-item input { width: auto; margin-right: 10px; }
+        .check-item input { width: auto; margin-right: 10px; margin-bottom: 0; }
 
-        .btn { display: block; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; }
+        .btn { 
+            display: block; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; 
+            text-decoration: none; cursor: pointer; border: none; transition: transform 0.2s, opacity 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn:active { transform: scale(0.98); }
+        
         .btn-whatsapp { background: var(--primary-color); color: #000; }
         .btn-receipt { background: var(--accent); color: #000; margin-top: 10px; }
-        .btn-entry { background: #e74c3c; color: #fff; margin-top: 10px; }
+        .btn-entry { background: var(--danger); color: #fff; margin-top: 10px; }
 
         #adminPanel { display: none; border-top: 2px solid var(--accent); margin-top: 20px; padding-top: 20px; }
     </style>
@@ -68,12 +89,14 @@
 <body>
 
 <div class="container">
-    <div class="card">
+    <div class="card" id="mainCard">
         <div class="icon-header" onclick="activarAdmin()">💻</div>
         <h1>TECH SUPPORT PRO</h1>
         <p class="subtitle">Diagnóstico y Recepción</p>
         
-        <a href="https://www.facebook.com/landy.cruz.868423" target="_blank" class="social-link"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.facebook.com/landy.cruz.868423" target="_blank" class="social-link">
+            <i class="fab fa-facebook"></i>
+        </a>
         
         <label>MARCA Y MODELO</label>
         <input type="text" id="equipo" placeholder="Ej: Laptop HP Pavilion">
@@ -93,10 +116,12 @@
             <textarea id="detalleOtraFalla" rows="2" placeholder="Explica brevemente..."></textarea>
         </div>
 
-        <a href="#" id="whatsappBtn" class="btn btn-whatsapp">ENVIAR A REVISIÓN</a>
+        <button id="whatsappBtn" class="btn btn-whatsapp" onclick="enviarRevision()">ENVIAR A REVISIÓN</button>
 
         <div id="adminPanel">
-            <h3 style="color: var(--accent); font-size: 1rem; margin-bottom: 15px;">🛠 PANEL TÉCNICO</h3>
+            <h3 style="color: var(--accent); font-size: 1rem; margin-bottom: 15px; text-transform: uppercase;">
+                🛠 PANEL TÉCNICO
+            </h3>
             <div class="checklist">
                 <label class="check-item"><input type="checkbox" class="condicion" value="Cargador incluido"> Cargador incluido</label>
                 <label class="check-item"><input type="checkbox" class="condicion" value="Rayones/Golpes"> Rayones o Golpes</label>
@@ -104,11 +129,15 @@
                 <label class="check-item"><input type="checkbox" class="condicion" value="Faltan tornillos"> Faltan tornillos</label>
                 <label class="check-item"><input type="checkbox" class="condicion" value="Enciende"> El equipo enciende</label>
             </div>
-            <button onclick="generarTicketEntrada()" class="btn btn-entry">TICKET DE ENTRADA</button>
+            <button onclick="generarTicketEntrada()" class="btn btn-entry">GENERAR TICKET ENTRADA</button>
+            
             <hr style="margin: 20px 0; border: 0.5px solid #444;">
-            <input type="number" id="costo" placeholder="Costo total ($)">
-            <textarea id="detalleTrabajo" rows="2" placeholder="Trabajo realizado..."></textarea>
-            <button onclick="generarReciboFinal()" class="btn btn-receipt">RECIBO FINAL</button>
+            
+            <label>COSTO DEL SERVICIO</label>
+            <input type="number" id="costo" placeholder="Ej: 500">
+            <label>DETALLES DEL TRABAJO</label>
+            <textarea id="detalleTrabajo" rows="2" placeholder="Se cambió disco duro, etc..."></textarea>
+            <button onclick="generarReciboFinal()" class="btn btn-receipt">GENERAR RECIBO FINAL</button>
         </div>
     </div>
 </div>
@@ -117,44 +146,68 @@
     const miNumero = "9392716820";
     let clics = 0;
 
+    // Función para activar modo técnico
     function activarAdmin() {
         clics++;
         if (clics === 3) {
             document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('mainCard').classList.add('admin-active');
             alert("🛠 Modo Técnico Activado.");
             clics = 0;
         }
     }
 
+    // Muestra/Oculta el área de texto si selecciona "OTRA"
     function verificarOtraFalla() {
         const selector = document.getElementById('fallaSelector');
         const contenedor = document.getElementById('contenedorOtraFalla');
         contenedor.style.display = (selector.value === "OTRA") ? 'block' : 'none';
-        actualizarEnlace();
     }
 
-    const equipoInput = document.getElementById('equipo');
-    const fallaSelect = document.getElementById('fallaSelector');
-    const detalleOtra = document.getElementById('detalleOtraFalla');
+    // Lógica para enviar mensaje de cliente (Revisión)
+    function enviarRevision() {
+        const equipo = document.getElementById('equipo').value.trim();
+        const fallaSel = document.getElementById('fallaSelector').value;
+        const detalle = document.getElementById('detalleOtraFalla').value.trim();
 
-    function actualizarEnlace() {
-        let falla = (fallaSelect.value === "OTRA") ? (detalleOtra.value || "Problema específico") : fallaSelect.value;
-        const msg = `Hola! Necesito soporte para mi ${equipoInput.value || 'Equipo'}. Problema: ${falla}.`;
-        document.getElementById('whatsappBtn').href = `https://wa.me/${miNumero}?text=${encodeURIComponent(msg)}`;
+        if (!equipo) {
+            alert("Por favor, ingresa el modelo del equipo.");
+            return;
+        }
+
+        let fallaFinal = (fallaSel === "OTRA") ? detalle : fallaSel;
+        if (fallaSel === "OTRA" && !detalle) {
+            alert("Por favor, describe la falla.");
+            return;
+        }
+
+        const msg = `Hola! 👋 Necesito soporte para mi *${equipo}*.\n\n🔧 *Falla:* ${fallaFinal}`;
+        window.open(`https://wa.me/${miNumero}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    [equipoInput, fallaSelect, detalleOtra].forEach(el => el.addEventListener('input', actualizarEnlace));
-
+    // Lógica para Ticket de Entrada (Admin)
     function generarTicketEntrada() {
-        let falla = (fallaSelect.value === "OTRA") ? detalleOtra.value : fallaSelect.value;
+        const equipo = document.getElementById('equipo').value || "Equipo Genérico";
+        const fallaSel = document.getElementById('fallaSelector').value;
+        const detalle = document.getElementById('detalleOtraFalla').value;
+        let fallaFinal = (fallaSel === "OTRA") ? detalle : fallaSel;
+
         let condiciones = [];
         document.querySelectorAll('.condicion:checked').forEach(c => condiciones.push("✅ " + c.value));
-        const ticket = `📥 *TICKET DE ENTRADA*\n━━━━━━━━━━━━━━━\n💻 *Equipo:* ${equipoInput.value}\n🔍 *Falla:* ${falla}\n📋 *Estado:* ${condiciones.join(', ')}\n━━━━━━━━━━━━━━━`;
+        
+        const ticket = `📥 *TICKET DE ENTRADA*\n━━━━━━━━━━━━━━━\n💻 *Equipo:* ${equipo}\n🔍 *Falla:* ${fallaFinal}\n📋 *Condiciones:* \n${condiciones.length > 0 ? condiciones.join('\n') : 'Ninguna'}\n━━━━━━━━━━━━━━━`;
+        
         window.open(`https://wa.me/?text=${encodeURIComponent(ticket)}`, '_blank');
     }
 
+    // Lógica para Recibo Final (Admin)
     function generarReciboFinal() {
-        const recibo = `📜 *RECIBO FINAL*\n━━━━━━━━━━━━━━━\n💻 *Equipo:* ${equipoInput.value}\n🛠 *Trabajo:* ${document.getElementById('detalleTrabajo').value}\n💰 *Total:* $${document.getElementById('costo').value}\n🛡️ *Garantía:* 30 días.\n━━━━━━━━━━━━━━━`;
+        const equipo = document.getElementById('equipo').value || "Equipo";
+        const trabajo = document.getElementById('detalleTrabajo').value || "Mantenimiento general";
+        const total = document.getElementById('costo').value || "0";
+        
+        const recibo = `📜 *RECIBO DE SERVICIO*\n━━━━━━━━━━━━━━━\n💻 *Equipo:* ${equipo}\n🛠 *Trabajo:* ${trabajo}\n💰 *Total:* $${total}\n🛡️ *Garantía:* 30 días\n━━━━━━━━━━━━━━━\n¡Gracias por su confianza!`;
+        
         window.open(`https://wa.me/?text=${encodeURIComponent(recibo)}`, '_blank');
     }
 </script>
